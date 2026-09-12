@@ -239,7 +239,25 @@
       }
     ];
 
-    let subjects = JSON.parse(JSON.stringify(initialData));
+    // LocalStorage functions for persistence
+    function loadFromStorage() {
+      const saved = localStorage.getItem('gradeCalcData');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Error loading saved data:', e);
+          return JSON.parse(JSON.stringify(initialData));
+        }
+      }
+      return JSON.parse(JSON.stringify(initialData));
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('gradeCalcData', JSON.stringify(subjects));
+    }
+
+    let subjects = loadFromStorage();
     let scoresChart, creditChart;
 
     function getGradeAndGpa(totalScore, cutoffs) {
@@ -334,11 +352,13 @@
 
     function updateScore(sIdx, aIdx, val) {
       subjects[sIdx].assessments[aIdx].score = parseFloat(val) || 0;
+      saveToStorage();
       updateDashboard();
     }
 
     function resetDefaults() {
       subjects = JSON.parse(JSON.stringify(initialData));
+      saveToStorage();
       updateDashboard();
     }
 
